@@ -23,3 +23,4 @@ INSERT INTO Type (libelleType) VALUES ('BMX');
 INSERT INTO Type (libelleType) VALUES ('Trial');
 
 
+INSERT INTO Velo VALUES (NULL, )
