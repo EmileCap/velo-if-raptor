@@ -6,6 +6,21 @@ from flask import Blueprint
 
 
 from controllers.auth_security import *
+from controllers.fixtures_load import *
+
+from controllers.client_article import *
+from controllers.client_panier import *
+from controllers.client_commande import *
+from controllers.client_commentaire import *
+from controllers.client_coordonnee import *
+
+from controllers.admin_article import *
+from controllers.admin_declinaison_article import *
+from controllers.admin_commande import *
+from controllers.admin_type_article import *
+from controllers.admin_dataviz import *
+from controllers.admin_commentaire import *
+from controllers.client_liste_envies import *
 
 app = Flask(__name__)
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
@@ -49,8 +64,22 @@ def before_request():
                 return redirect('/logout')
 
 
-
 app.register_blueprint(auth_security)
+app.register_blueprint(fixtures_load)
+
+app.register_blueprint(client_article)
+app.register_blueprint(client_commande)
+app.register_blueprint(client_commentaire)
+app.register_blueprint(client_panier)
+app.register_blueprint(client_coordonnee)
+app.register_blueprint(client_liste_envies)
+
+app.register_blueprint(admin_article)
+app.register_blueprint(admin_declinaison_article)
+app.register_blueprint(admin_commande)
+app.register_blueprint(admin_type_article)
+app.register_blueprint(admin_dataviz)
+app.register_blueprint(admin_commentaire)
 
 
 if __name__ == '__main__':
