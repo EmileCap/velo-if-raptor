@@ -14,7 +14,7 @@ def client_article_show():                                 # remplace client_ind
     mycursor = get_db().cursor()
     id_client = session['id_user']
 
-    sql = '''   selection des articles   '''
+    sql = '''   SELECT nom_velo, description_velo, photo_velo, stock_velo, prix_velo FROM Velo  '''
     list_param = []
     condition_and = ""
     # utilisation du filtre
