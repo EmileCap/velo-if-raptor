@@ -2,22 +2,21 @@ from flask import Flask, request, render_template, redirect, url_for, abort, fla
 
 import pymysql.cursors
 
+from flask import g
+import os
+
 def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        #
-        db = g._database = pymysql.connect(
-            host="localhost",
-            # host="serveurmysql",
-            user="jcarmill",
-            password="secret",
-            database="S2SAE04",
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
+    if 'db' not in g:
+        g.db = pymysql.connect(
+            host=os.environ.get("mysql.railway.internal"),
+            user=os.environ.get("root"),
+            password=os.environ.get("OTyUUJRjyHMcXtDAhcCdXvdNUPTMOAcR"),
+            database=os.environ.get("railway"),
+            port=int(os.environ.get("MYSQLPORT", 3306)),
+            cursorclass=pymysql.cursors.DictCursor,
+            autocommit=True
         )
-        # à activer sur les machines personnelles :
-        activate_db_options(db)
-    return db
+    return g.db
 
 def activate_db_options(db):
     cursor = db.cursor()
