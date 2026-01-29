@@ -14,12 +14,18 @@ def client_article_show():                                 # remplace client_ind
     mycursor = get_db().cursor()
     id_client = session['id_user']
 
-    sql = '''   SELECT nom_velo, description_velo, photo_velo, stock_velo, prix_velo FROM Velo  '''
-    list_param = []
+    sql = """
+    SELECT nom_velo AS nom,
+        prix_velo AS prix,
+        photo_velo AS photo,
+        stock_velo AS stock
+    FROM Velo
+    """
     condition_and = ""
     # utilisation du filtre
     sql3=''' prise en compte des commentaires et des notes dans le SQL    '''
-    articles =[]
+    mycursor.execute(sql)
+    articles = mycursor.fetchall()
 
 
     # pour le filtre
