@@ -18,7 +18,8 @@ def client_article_show():                                 # remplace client_ind
     SELECT nom_velo AS nom,
         prix_velo AS prix,
         photo_velo AS photo,
-        stock_velo AS stock
+        stock_velo AS stock,
+        photo_velo AS image
     FROM Velo
     """
     condition_and = ""

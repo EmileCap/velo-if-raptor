@@ -118,7 +118,7 @@ INSERT INTO etat(libelle_etat) VALUES
 
 -- Vélo
 INSERT INTO Velo(nom_velo, prix_velo, description_velo, photo_velo, stock_velo, matiere_velo, couleure_velo, marque_velo, fournisseur_velo, Id_taille, Id_type) VALUES
-('Trek Domane SL6', 2300, 'Vélo de route haut de gamme carbone', 'Trek-domane-sl6-gen4.png', 5, 'Carbone', 'Noir', 'Trek', 'CycleWorld', 3, 1),
+('Trek Domane SL6', 2300, 'Vélo de route haut de gamme carbone', 'Trek-domane-sl6-gen4-2024.png', 5, 'Carbone', 'Noir', 'Trek', 'CycleWorld', 3, 1),
 ('Specialized Diverge Comp', 2100, 'Gravel polyvalent avec pneus 40mm', 'Specialized Diverge Comp.png', 7, 'Aluminium', 'Rouge', 'Specialized', 'BikePro', 4, 2),
 ('Cannondale Trail 5', 900, 'VTT tout suspendu entrée de gamme', 'Cannondale Trail 5.png', 10, 'Aluminium', 'Vert', 'Cannondale', 'OutdoorShop', 4, 3),
 ('Giant ToughRoad SLR', 1300, 'Gravel ready pour aventures longues distances', 'Giant ToughRoad SLR.png', 3, 'Carbone', 'Bleu', 'Giant', 'CycleZone', 2, 2),

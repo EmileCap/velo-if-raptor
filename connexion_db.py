@@ -7,14 +7,13 @@ import os
 
 def get_db():
     if 'db' not in g:
-        g.db = pymysql.connect(
-            host=os.environ.get("mysql.railway.internal"),
-            user=os.environ.get("root"),
-            password=os.environ.get("OTyUUJRjyHMcXtDAhcCdXvdNUPTMOAcR"),
-            database=os.environ.get("railway"),
-            port=int(os.environ.get("MYSQLPORT", 3306)),
-            cursorclass=pymysql.cursors.DictCursor,
-            autocommit=True
+        g.db =  pymysql.connect(
+            host="localhost",                 # à modifier
+            user="jcarmill",                     # à modifier
+            password="secret",                # à modifier
+            database="S2SAE04",        # à modifier
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
         )
     return g.db
 
