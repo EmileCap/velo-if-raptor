@@ -61,19 +61,6 @@ CREATE TABLE Velo(
    FOREIGN KEY(Id_type) REFERENCES type(Id_type)
 );
 
-CREATE TABLE utilisateur(
-   Id_utilisateur INT AUTO_INCREMENT,
-   login_utilisateur VARCHAR(50),
-   password_utilisateur VARCHAR(50),
-   role_utilisateur VARCHAR(50),
-   est_actif_utilisateur BOOLEAN,
-   nom_utilisateur VARCHAR(50),
-   email_utilisateur VARCHAR(50),
-   Id_panier INT NOT NULL,
-   PRIMARY KEY(Id_utilisateur),
-   FOREIGN KEY(Id_panier) REFERENCES panier(Id_panier)
-);
-
 CREATE TABLE commande(
    Id_commande INT AUTO_INCREMENT,
    date_commande DATE,
@@ -131,19 +118,19 @@ INSERT INTO etat(libelle_etat) VALUES
 
 -- Vélo
 INSERT INTO Velo(nom_velo, prix_velo, description_velo, photo_velo, stock_velo, matiere_velo, couleure_velo, marque_velo, fournisseur_velo, Id_taille, Id_type) VALUES
-('Trek Domane SL6', 2300, 'Vélo de route haut de gamme carbone', 'trek_domane_sl6.jpg', 5, 'Carbone', 'Noir', 'Trek', 'CycleWorld', 3, 1),
-('Specialized Diverge Comp', 2100, 'Gravel polyvalent avec pneus 40mm', 'specialized_diverge_comp.jpg', 7, 'Aluminium', 'Rouge', 'Specialized', 'BikePro', 4, 2),
-('Cannondale Trail 5', 900, 'VTT tout suspendu entrée de gamme', 'cannondale_trail5.jpg', 10, 'Aluminium', 'Vert', 'Cannondale', 'OutdoorShop', 4, 3),
-('Giant ToughRoad SLR', 1300, 'Gravel ready pour aventures longues distances', 'giant_toughroad_slr.jpg', 3, 'Carbone', 'Bleu', 'Giant', 'CycleZone', 2, 2),
-('Cube Kathmandu Hybrid', 2500, 'VTC électrique polyvalent', 'cube_kathmandu_hybrid.jpg', 4, 'Aluminium', 'Gris', 'Cube', 'EbikeWorld', 4, 5),
-('Specialized Turbo Vado', 2800, 'Vélo urbain électrique rapide', 'specialized_turbo_vado.jpg', 2, 'Aluminium', 'Blanc', 'Specialized', 'UrbanBike', 3, 5),
-('BMC Teammachine SLR01', 4500, 'Vélo de route ultra performant carbone', 'bmc_teammachine_slr01.jpg', 3, 'Carbone', 'Gris', 'BMC', 'EliteCycles', 3, 1),
-('Canyon Grail CF SL 7', 2800, 'Gravel carbone avec double cockpit', 'canyon_grail_cf_sl7.jpg', 5, 'Carbone', 'Bleu', 'Canyon', 'GravelGear', 4, 2),
-('Scott Scale 940', 1500, 'Hardtail VTT rapide et léger', 'scott_scale_940.jpg', 6, 'Carbone', 'Noir', 'Scott', 'MountainLife', 4, 3),
-('Merida Silex 200', 1600, 'Gravel moderne pour longues distances', 'merida_silex_200.jpg', 4, 'Aluminium', 'Rouge', 'Merida', 'BikePlanet', 4, 2),
-('Specialized Rockhopper Comp', 1100, 'VTT polyvalent trail', 'specialized_rockhopper_comp.jpg', 8, 'Aluminium', 'Vert', 'Specialized', 'TrailZone', 4, 3),
-('Trek FX Sport 4', 1000, 'VTC performant pour ville et loisirs', 'trek_fx_sport4.jpg', 7, 'Aluminium', 'Noir', 'Trek', 'UrbanCycling', 4, 4),
-('Giant Contend AR 3', 1300, 'Route endurance avec pneus larges', 'giant_contend_ar3.jpg', 5, 'Aluminium', 'Bleu', 'Giant', 'CyclePlus', 3, 1),
-('Orbea Wild FS M20', 3200, 'VTT tout suspendu haut de gamme', 'orbea_wild_fs_m20.jpg', 2, 'Carbone', 'Orange', 'Orbea', 'ProGear', 4, 3),
-('VanMoof S3', 2200, 'Vélo électrique urbain connecté', 'vanmoof_s3.jpg', 4, 'Aluminium', 'Blanc', 'VanMoof', 'SmartBike', 3, 5),
-('Ribble Endurance AL Disc', 1400, 'Route endurance avec freins à disque', 'ribble_endurance_al_disc.jpg', 6, 'Aluminium', 'Rouge', 'Ribble', 'EuroCycles', 4, 1);
+('Trek Domane SL6', 2300, 'Vélo de route haut de gamme carbone', 'Trek-domane-sl6-gen4.png', 5, 'Carbone', 'Noir', 'Trek', 'CycleWorld', 3, 1),
+('Specialized Diverge Comp', 2100, 'Gravel polyvalent avec pneus 40mm', 'Specialized Diverge Comp.png', 7, 'Aluminium', 'Rouge', 'Specialized', 'BikePro', 4, 2),
+('Cannondale Trail 5', 900, 'VTT tout suspendu entrée de gamme', 'Cannondale Trail 5.png', 10, 'Aluminium', 'Vert', 'Cannondale', 'OutdoorShop', 4, 3),
+('Giant ToughRoad SLR', 1300, 'Gravel ready pour aventures longues distances', 'Giant ToughRoad SLR.png', 3, 'Carbone', 'Bleu', 'Giant', 'CycleZone', 2, 2),
+('Cube Kathmandu Hybrid', 2500, 'VTC électrique polyvalent', 'Cube Kathmandu Hybrid.png', 4, 'Aluminium', 'Gris', 'Cube', 'EbikeWorld', 4, 5),
+('Specialized Turbo Vado', 2800, 'Vélo urbain électrique rapide', 'Specialized Turbo Vado.png', 2, 'Aluminium', 'Blanc', 'Specialized', 'UrbanBike', 3, 5),
+('BMC Teammachine SLR01', 4500, 'Vélo de route ultra performant carbone', 'BMC Teammachine SLR01.png', 3, 'Carbone', 'Gris', 'BMC', 'EliteCycles', 3, 1),
+('Canyon Grail CF SL 7', 2800, 'Gravel carbone avec double cockpit', 'Canyon Grail CF SL 7.png', 5, 'Carbone', 'Bleu', 'Canyon', 'GravelGear', 4, 2),
+('Scott Scale 940', 1500, 'Hardtail VTT rapide et léger', 'Scott Scale 940.png', 6, 'Carbone', 'Noir', 'Scott', 'MountainLife', 4, 3),
+('Merida Silex 200', 1600, 'Gravel moderne pour longues distances', 'Merida Silex 200.png', 4, 'Aluminium', 'Rouge', 'Merida', 'BikePlanet', 4, 2),
+('Specialized Rockhopper Comp', 1100, 'VTT polyvalent trail', 'Specialized Rockhopper Comp.png', 8, 'Aluminium', 'Vert', 'Specialized', 'TrailZone', 4, 3),
+('Trek FX Sport 4', 1000, 'VTC performant pour ville et loisirs', 'Trek FX Sport 4.png', 7, 'Aluminium', 'Noir', 'Trek', 'UrbanCycling', 4, 4),
+('Giant Contend AR 3', 1300, 'Route endurance avec pneus larges', 'Giant Contend AR 3.png', 5, 'Aluminium', 'Bleu', 'Giant', 'CyclePlus', 3, 1),
+('Orbea Wild FS M20', 3200, 'VTT tout suspendu haut de gamme', 'Orbea Wild FS M20.png', 2, 'Carbone', 'Orange', 'Orbea', 'ProGear', 4, 3),
+('VanMoof S3', 2200, 'Vélo électrique urbain connecté', 'VanMoof S3.png', 4, 'Aluminium', 'Blanc', 'VanMoof', 'SmartBike', 3, 5),
+('Ribble Endurance AL Disc', 1400, 'Route endurance avec freins à disque', 'Ribble Endurance AL Disc.png', 6, 'Aluminium', 'Rouge', 'Ribble', 'EuroCycles', 4, 1);

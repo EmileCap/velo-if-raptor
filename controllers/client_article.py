@@ -27,9 +27,11 @@ def client_article_show():                                 # remplace client_ind
     mycursor.execute(sql)
     articles = mycursor.fetchall()
 
-
+    sql2 = ''' 
+    SELECT Id_type as id_type_article, libelle_type FROM type '''
+    mycursor.execute(sql2)
     # pour le filtre
-    types_article = []
+    types_article = mycursor.fetchall()
 
 
     articles_panier = []

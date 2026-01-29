@@ -13,10 +13,10 @@
 {#                   {%  if idItem in session['filter_types'] %} checked  {% endif %} #}
                    {{ ' checked ' if (id_item in session['filter_types']) else '' }}
                {% endif %}
-{#                https://stackoverflow.com/questions/58433775/how-to-access-the-value-of-each-checkbox-in-a-table-with-flask#}
-            >  {{ item_filtre.libelle }}
+{#                https://stackoverflow.com/questions/58433775/how-to-access-the-value-of-each-checkbox-in-a-table-with-flask #}
+            >  {{ item_filtre.libelle_type}}
             <br/>
-        {% endfor %}
+        {% endfor %}>
     </div>
     {% endif %}
 
