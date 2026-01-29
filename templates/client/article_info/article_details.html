@@ -96,7 +96,7 @@
         {% endif %}
       </div>
       {% if commandes_articles.nb_commandes_article is defined and commandes_articles.nb_commandes_article > 0 and
-            ((nb_commentaires.nb_commentaires_utilisateur is defined and nb_commentaires.nb_commentaires_utilisateur <3) or nb_commentaires.nb_commentaires_utilisateur is not defined) %}
+            ((nb_commentaires.nb_commentaires_utilisateur is defined and nb_commentaires.nb_commentaires_utilisateur <3) or nb_commentaires.nb_commentaires_utilisateur is not defined) %}>
           <form  action="/client/commentaire/add"   method="post">
                 <div class="col">
                   <label for="input_commentaire" class="form-label">Mettez un commentaire sur cet article : </label>
