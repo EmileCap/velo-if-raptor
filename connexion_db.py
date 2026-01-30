@@ -12,18 +12,18 @@ load_dotenv()  # à ajouter
 
 import os
 
+
+import mysql.connector
+
 def get_db():
-    if 'db' not in g:
-        g.db = pymysql.connect(
-            host=os.environ.get("MYSQLHOST"),
-            user=os.environ.get("MYSQLUSER"),
-            password=os.environ.get("MYSQLPASSWORD"),
-            database=os.environ.get("MYSQLDATABASE"),
-            port=int(os.environ.get("MYSQLPORT")),
-            charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor
-        )
-    return g.db
+    db = mysql.connector.connect(
+        host=os.environ["MYSQLHOST"],
+        user=os.environ["MYSQLUSER"],
+        password=os.environ["MYSQLPASSWORD"],
+        database=os.environ["MYSQLDATABASE"],
+        port=int(os.environ["MYSQLPORT"])
+    )
+    return db
 
 
 def activate_db_options(db):
