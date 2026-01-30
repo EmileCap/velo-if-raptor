@@ -49,6 +49,21 @@ def show_accueil():
 # Authentification
 ##################
 
+
+@app.route("/init-db")
+def init_db():
+    db = get_db()
+    cur = db.cursor()
+
+    with open("sae_sql.sql", "r", encoding="utf-8") as f:
+        sql = f.read()
+        for stmt in sql.split(";"):
+            if stmt.strip():
+                cur.execute(stmt)
+
+    db.commit()
+    return "BDD initialisée 🚀"
+
 # Middleware de sécurité
 
 @app.before_request
