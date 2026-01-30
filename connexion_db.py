@@ -3,15 +3,18 @@ from flask import Flask, request, render_template, redirect, url_for, abort, fla
 import pymysql.cursors
 
 from flask import g
-import os
+
+import os                                 # à ajouter
+from dotenv import load_dotenv            # à ajouter
+load_dotenv()                             # à ajouter
 
 def get_db():
     if 'db' not in g:
         g.db =  pymysql.connect(
-            host="localhost",                 # à modifier
-            user="jcarmill",                     # à modifier
-            password="secret",                # à modifier
-            database="S2SAE04",        # à modifier
+            host=os.environ.get("HOST"),                # à modifier
+            user=os.environ.get("LOGIN"),               # à modifier
+            password=os.environ.get("PASSWORD"),        # à modifier
+            database=os.environ.get("DATABASE"),        # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
