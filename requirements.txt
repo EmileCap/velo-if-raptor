@@ -3,3 +3,4 @@ gunicorn
 pymysql
 mysql-connector-python==8.1.0
 python-dotenv==1.0.1
+cryptography
