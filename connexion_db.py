@@ -17,11 +17,11 @@ import mysql.connector
 
 def get_db():
     db = mysql.connector.connect(
-        host=os.environ["MYSQLHOST"],
-        user=os.environ["MYSQLUSER"],
-        password=os.environ["MYSQLPASSWORD"],
-        database=os.environ["MYSQLDATABASE"],
-        port=int(os.environ["MYSQLPORT"])
+        host=os.environ["mysql.railway.internal"],
+        user=os.environ["root"],
+        password=os.environ["OTyUUJRjyHMcXtDAhcCdXvdNUPTMOAcR"],
+        database=os.environ["railway"],
+        port=int(os.environ["3306"])
     )
     return db
 
