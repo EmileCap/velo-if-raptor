@@ -114,7 +114,7 @@ INSERT INTO taille(libelle_taille) VALUES
 
 -- Etats
 INSERT INTO etat(libelle_etat) VALUES
-('Neuf'), ('Très bon état'), ('Bon état'), ('Etat moyen'), ('A réparer');
+('Terminée'), ('En cours'), ('Expédié');
 
 -- Vélo
 INSERT INTO Velo(nom_velo, prix_velo, description_velo, photo_velo, stock_velo, matiere_velo, couleure_velo, marque_velo, fournisseur_velo, Id_taille, Id_type) VALUES
