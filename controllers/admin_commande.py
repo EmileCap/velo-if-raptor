@@ -18,7 +18,7 @@ def admin_index():
 def admin_commande_show():
     mycursor = get_db().cursor()
     admin_id = session['id_user']
-    sql = '''      '''
+    sql = '''  '''
 
     commandes=[]
 

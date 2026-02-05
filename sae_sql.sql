@@ -93,30 +93,25 @@ CREATE TABLE ligne_panier(
    FOREIGN KEY(Id_panier) REFERENCES panier(Id_panier)
 );
 
+-- 1. Utilisateurs
 INSERT INTO utilisateur(id_utilisateur,login,email,password,role,nom,est_actif) VALUES
-(1,'admin','admin@admin.fr',
-    'pbkdf2:sha256:1000000$eQDrpqICHZ9eaRTn$446552ca50b5b3c248db2dde6deac950711c03c5d4863fe2bd9cef31d5f11988',
-    'ROLE_admin','admin','1'),
-(2,'client','client@client.fr',
-    'pbkdf2:sha256:1000000$jTcSUnFLWqDqGBJz$bf570532ed29dc8e3836245f37553be6bfea24d19dfb13145d33ab667c09b349',
-    'ROLE_client','client','1'),
-(3,'client2','client2@client2.fr',
-    'pbkdf2:sha256:1000000$qDAkJlUehmaARP1S$39044e949f63765b785007523adcde3d2ad9c2283d71e3ce5ffe58cbf8d86080',
-    'ROLE_client','client2','1');
+(1,'admin','admin@admin.fr','pbkdf2:sha256:1000000$eQDrpqICHZ9eaRTn$446552ca50b5b3c248db2dde6deac950711c03c5d4863fe2bd9cef31d5f11988','ROLE_admin','admin',1),
+(2,'client','client@client.fr','pbkdf2:sha256:1000000$jTcSUnFLWqDqGBJz$bf570532ed29dc8e3836245f37553be6bfea24d19dfb13145d33ab667c09b349','ROLE_client','client',1),
+(3,'client2','client2@client2.fr','pbkdf2:sha256:1000000$qDAkJlUehmaARP1S$39044e949f63765b785007523adcde3d2ad9c2283d71e3ce5ffe58cbf8d86080','ROLE_client','client2',1);
 
-    -- Types
+-- 2. Types
 INSERT INTO type(libelle_type) VALUES
 ('Route'), ('Gravel'), ('VTT'), ('Urbain'), ('Electrique'), ('Cadre'), ('Accessoire'), ('Piece');
 
--- Tailles
+-- 3. Tailles
 INSERT INTO taille(libelle_taille) VALUES
 ('XS'), ('S'), ('M'), ('L'), ('XL'), ('XXL');
 
--- Etats
+-- 4. Etats
 INSERT INTO etat(libelle_etat) VALUES
 ('Terminée'), ('En cours'), ('Expédié');
 
--- Vélo
+-- 5. Vélos
 INSERT INTO Velo(nom_velo, prix_velo, description_velo, photo_velo, stock_velo, matiere_velo, couleure_velo, marque_velo, fournisseur_velo, Id_taille, Id_type) VALUES
 ('Trek Domane SL6', 2300, 'Vélo de route haut de gamme carbone', 'Trek-domane-sl6-gen4-2024.png', 5, 'Carbone', 'Noir', 'Trek', 'CycleWorld', 3, 1),
 ('Specialized Diverge Comp', 2100, 'Gravel polyvalent avec pneus 40mm', 'Specialized Diverge Comp.png', 7, 'Aluminium', 'Rouge', 'Specialized', 'BikePro', 4, 2),
@@ -134,3 +129,20 @@ INSERT INTO Velo(nom_velo, prix_velo, description_velo, photo_velo, stock_velo, 
 ('Orbea Wild FS M20', 3200, 'VTT tout suspendu haut de gamme', 'Orbea Wild FS M20.png', 2, 'Carbone', 'Orange', 'Orbea', 'ProGear', 4, 3),
 ('VanMoof S3', 2200, 'Vélo électrique urbain connecté', 'VanMoof S3.png', 4, 'Aluminium', 'Blanc', 'VanMoof', 'SmartBike', 3, 5),
 ('Ribble Endurance AL Disc', 1400, 'Route endurance avec freins à disque', 'Ribble Endurance AL Disc.png', 6, 'Aluminium', 'Rouge', 'Ribble', 'EuroCycles', 4, 1);
+
+-- 6. Paniers (avant commande)
+INSERT INTO panier(taille_panier, prix_panier) VALUES
+('Petit','100'),('Moyen','200'),('Grand','300');
+
+-- 7. Commandes
+-- Ici tu dois mettre Id_etat, Id_panier, Id_utilisateur existants
+INSERT INTO commande(date_commande, prix_commande, Id_etat, Id_panier, Id_utilisateur) VALUES
+('2026-02-05','200',2,1,2);
+
+-- 8. Lignes de panier
+INSERT INTO ligne_panier(Id_Velo, Id_panier, quantite) VALUES
+(1,1,2),(2,1,1),(3,2,1);
+
+-- 9. Lignes de commande
+INSERT INTO ligne_commande(Id_Velo, Id_commande, quantite) VALUES
+(1,1,2),(2,1,1);
