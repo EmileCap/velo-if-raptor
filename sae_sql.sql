@@ -33,7 +33,7 @@ CREATE TABLE taille(
 CREATE TABLE panier(
    Id_panier INT AUTO_INCREMENT,
    taille_panier VARCHAR(50),
-   prix_panier VARCHAR(50),
+   prix_panier INT,
    PRIMARY KEY(Id_panier)
 );
 
@@ -64,25 +64,27 @@ CREATE TABLE Velo(
 CREATE TABLE commande(
    Id_commande INT AUTO_INCREMENT,
    date_commande DATE,
-   prix_commande VARCHAR(50),
+   prix_commande INT,
    Id_etat INT NOT NULL,
    Id_panier INT NOT NULL,
    Id_utilisateur INT NOT NULL,
    PRIMARY KEY(Id_commande),
-   UNIQUE(Id_panier),
-   FOREIGN KEY(Id_etat) REFERENCES etat(Id_etat),
-   FOREIGN KEY(Id_panier) REFERENCES panier(Id_panier),
-   FOREIGN KEY(Id_utilisateur) REFERENCES utilisateur(Id_utilisateur)
+   CONSTRAINT uk_commande_panier UNIQUE (Id_panier),
+   CONSTRAINT fk_commande_etat FOREIGN KEY (Id_etat) REFERENCES etat(Id_etat),
+   CONSTRAINT fk_commande_panier FOREIGN KEY (Id_panier) REFERENCES panier(Id_panier),
+   CONSTRAINT fk_commande_utilisateur FOREIGN KEY (Id_utilisateur) REFERENCES utilisateur(Id_utilisateur)
 );
+
 
 CREATE TABLE ligne_commande(
    Id_Velo INT,
    Id_commande INT,
-   quantite VARCHAR(50),
+   quantite INT NOT NULL,
    PRIMARY KEY(Id_Velo, Id_commande),
-   FOREIGN KEY(Id_Velo) REFERENCES Velo(Id_Velo),
-   FOREIGN KEY(Id_commande) REFERENCES commande(Id_commande)
+   CONSTRAINT fk_lc_velo FOREIGN KEY (Id_Velo) REFERENCES Velo(Id_Velo),
+   CONSTRAINT fk_lc_commande FOREIGN KEY (Id_commande) REFERENCES commande(Id_commande)
 );
+
 
 CREATE TABLE ligne_panier(
    Id_Velo INT,
@@ -132,12 +134,12 @@ INSERT INTO Velo(nom_velo, prix_velo, description_velo, photo_velo, stock_velo, 
 
 -- 6. Paniers (avant commande)
 INSERT INTO panier(taille_panier, prix_panier) VALUES
-('Petit','100'),('Moyen','200'),('Grand','300');
+('Petit',100),('Moyen','200'),('Grand','300');
 
 -- 7. Commandes
 -- Ici tu dois mettre Id_etat, Id_panier, Id_utilisateur existants
 INSERT INTO commande(date_commande, prix_commande, Id_etat, Id_panier, Id_utilisateur) VALUES
-('2026-02-05','200',2,1,2);
+('2026-02-05',200,2,1,2);
 
 -- 8. Lignes de panier
 INSERT INTO ligne_panier(Id_Velo, Id_panier, quantite) VALUES
