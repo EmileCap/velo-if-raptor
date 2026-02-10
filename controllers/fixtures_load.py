@@ -162,42 +162,41 @@ def fct_fixtures_load():
 
     sql = """
     CREATE TABLE commande(
-        Id_commande INT AUTO_INCREMENT,
-        date_commande DATE,
-        prix_commande VARCHAR(50),
-        Id_etat INT NOT NULL,
-        Id_panier INT NOT NULL,
-        Id_utilisateur INT NOT NULL,
-        PRIMARY KEY(Id_commande),
-        UNIQUE(Id_panier),
-        FOREIGN KEY(Id_etat) REFERENCES etat(Id_etat),
-        FOREIGN KEY(Id_panier) REFERENCES panier(Id_panier),
-        FOREIGN KEY(Id_utilisateur) REFERENCES utilisateur(Id_utilisateur)
+    id_commande INT PRIMARY KEY AUTO_INCREMENT,
+    date_achat DATE NOT NULL,
+    utilisateur_id INT NOT NULL,
+    etat_id INT NOT NULL,
+    FOREIGN KEY(utilisateur_id) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY(etat_id) REFERENCES etat(id_etat)
     ) DEFAULT CHARSET=utf8;
     """
     mycursor.execute(sql)
 
     sql = """
-    INSERT INTO commande(date_commande, prix_commande, Id_etat, Id_panier, Id_utilisateur)
-    VALUES ('2024-01-10', '2300', 1, 1, 2);
+    INSERT INTO commande(id_commande, date_achat, utilisateur_id, etat_id) VALUES
+    (1,'2026-02-05',2,2),
+    (2,'2026-02-01',3,1);
     """
     mycursor.execute(sql)
 
     sql = """
     CREATE TABLE ligne_commande(
-        Id_Velo INT,
-        Id_commande INT,
-        quantite VARCHAR(50),
-        PRIMARY KEY(Id_Velo, Id_commande),
-        FOREIGN KEY(Id_Velo) REFERENCES Velo(Id_Velo),
-        FOREIGN KEY(Id_commande) REFERENCES commande(Id_commande)
+    commande_id INT NOT NULL,
+    article_id INT NOT NULL,
+    prix INT NOT NULL,
+    quantite INT NOT NULL,
+    PRIMARY KEY(commande_id, article_id),
+    FOREIGN KEY(commande_id) REFERENCES commande(id_commande),
+    FOREIGN KEY(article_id) REFERENCES Velo(id_velo)
     );
     """
     mycursor.execute(sql)
 
     sql = """
-    INSERT INTO ligne_commande(Id_Velo, Id_commande, quantite)
-    VALUES (1, 1, '1');
+    INSERT INTO ligne_commande(commande_id, article_id, prix, quantite) VALUES
+    (1,1,2300,2),
+    (1,2,2100,1),
+    (2,3,900,1);
     """
     mycursor.execute(sql)
 

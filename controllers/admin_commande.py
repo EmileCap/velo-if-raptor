@@ -18,9 +18,31 @@ def admin_index():
 def admin_commande_show():
     mycursor = get_db().cursor()
     admin_id = session['id_user']
-    sql = '''  '''
+    sql = ''' 
+    SELECT 
+        commande.id_commande,
+        utilisateur.login,
+        commande.date_achat,
+        COUNT(ligne_commande.article_id) AS nbr_articles,
+        SUM(ligne_commande.quantite) AS prix_total,
+        etat.libelle_etat AS libelle
+    FROM commande
+    INNER JOIN utilisateur 
+        ON commande.utilisateur_id = utilisateur.id_utilisateur
+    INNER JOIN ligne_commande 
+        ON commande.id_commande = ligne_commande.commande_id
+    INNER JOIN etat 
+        ON commande.etat_id = etat.id_etat
+    GROUP BY 
+        commande.id_commande,
+        utilisateur.login,
+        commande.date_achat,
+        etat.libelle_etat;
+    '''
 
-    commandes=[]
+    mycursor.execute(sql)
+
+    commandes= mycursor.fetchall()
 
     articles_commande = None
     commande_adresses = None

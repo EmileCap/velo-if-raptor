@@ -27,7 +27,7 @@ CREATE TABLE utilisateur (
 -- ==============================================
 CREATE TABLE etat(
    id_etat INT PRIMARY KEY AUTO_INCREMENT,
-   libelle VARCHAR(50) NOT NULL
+   libelle_etat VARCHAR(50) NOT NULL
 );
 
 -- ==============================================
