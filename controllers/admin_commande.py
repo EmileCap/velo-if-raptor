@@ -49,6 +49,19 @@ def admin_commande_show():
     id_commande = request.args.get('id_commande', None)
     print(id_commande)
     if id_commande != None:
+
+        sql = '''
+    SELECT nom_velo as nom, quantite, prix, SUM(prix*quantite) AS prix_ligne
+    FROM commande
+    INNER JOIN ligne_commande ON id_commande = commande_id
+    INNER JOIN Velo ON article_id = id_velo
+    WHERE id_commande = %s
+    GROUP BY id_velo, nom_velo, quantite, prix;
+    '''
+        mycursor.execute(sql, id_commande)
+        articles_commande = mycursor.fetchall()
+        
+
         sql = '''    '''
         commande_adresses = []
     return render_template('admin/commandes/show.html'
