@@ -15,7 +15,8 @@ def client_article_show():                                 # remplace client_ind
     id_client = session['id_user']
 
     sql = """
-    SELECT nom_velo AS nom,
+    SELECT id_velo AS id_article,
+        nom_velo AS nom,
         prix_velo AS prix,
         photo_velo AS photo,
         stock_velo AS stock,
@@ -35,17 +36,28 @@ def client_article_show():                                 # remplace client_ind
     types_article = mycursor.fetchall()
 
 
-    articles_panier = []
+    # Charger le panier du client connecté
+    sql_panier = '''
+        SELECT v.id_velo AS id_article,
+               v.nom_velo AS nom,
+               v.prix_velo AS prix,
+               v.stock_velo AS stock,
+               lp.quantite
+        FROM ligne_panier lp
+        JOIN Velo v ON v.id_velo = lp.article_id
+        WHERE lp.utilisateur_id = %s
+    '''
+    mycursor.execute(sql_panier, (id_client,))
+    articles_panier = mycursor.fetchall()
 
     if len(articles_panier) >= 1:
-        sql = ''' calcul du prix total du panier '''
-        prix_total = None
+        prix_total = sum(item['prix'] * item['quantite'] for item in articles_panier)
     else:
         prix_total = None
     return render_template('client/boutique/panier_article.html'
                            , articles=articles
                            , articles_panier=articles_panier
-                           #, prix_total=prix_total
+                           , prix_total=prix_total
                            , items_filtre=types_article
                            )
 
