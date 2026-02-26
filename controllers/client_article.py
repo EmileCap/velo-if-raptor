@@ -48,3 +48,6 @@ def client_article_show():                                 # remplace client_ind
                            #, prix_total=prix_total
                            , items_filtre=types_article
                            )
+
+
+#test merge
