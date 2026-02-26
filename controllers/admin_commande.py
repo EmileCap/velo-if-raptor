@@ -78,7 +78,11 @@ def admin_commande_valider():
     commande_id = request.form.get('id_commande', None)
     if commande_id != None:
         print(commande_id)
-        sql = '''           '''
+        sql = '''   UPDATE etat
+            INNER JOIN commande
+                ON etat.id_etat = commande.etat_id 
+            SET libelle_etat = "Expédié"
+            WHERE id_commande = %s    '''
         mycursor.execute(sql, commande_id)
         get_db().commit()
     return redirect('/admin/commande/show')
