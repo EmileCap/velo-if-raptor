@@ -44,7 +44,10 @@ def valid_add_declinaison_article():
 def edit_declinaison_article():
     id_declinaison_article = request.args.get('id_declinaison_article')
     mycursor = get_db().cursor()
-    declinaison_article=[]
+    declinaison_article = '''
+    SELECT couleurs, tailles, d_taille_uniq, d_couleur_uniq, stock_velo as stock FROM Declinaison
+    INNER JOIN 
+    '''
     couleurs=None
     tailles=None
     d_taille_uniq=None

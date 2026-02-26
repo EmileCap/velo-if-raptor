@@ -120,16 +120,20 @@ def edit_article():
     mycursor.execute(sql)
     types_article = mycursor.fetchall()
 
-    # sql = '''
-    # requête admin_article_6
-    # '''
-    # mycursor.execute(sql, id_article)
-    # declinaisons_article = mycursor.fetchall()
+    sql = '''
+    SELECT libelle_taille, couleur as libelle_couleur, stock
+    FROM declinaison
+    INNER JOIN taille ON declinaison.id_taille = taille.id_taille
+    INNER JOIN Velo ON declinaison.id_velo = Velo.id_velo
+    WHERE Velo.id_velo = %s
+    '''
+    mycursor.execute(sql, id_article)
+    declinaisons_article = mycursor.fetchall()
 
     return render_template('admin/article/edit_article.html'
                            ,article=article
                            ,types_article=types_article
-                         #  ,declinaisons_article=declinaisons_article
+                           ,declinaisons_article=declinaisons_article
                            )
 
 
