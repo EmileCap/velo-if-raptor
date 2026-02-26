@@ -4,6 +4,7 @@ from flask import Blueprint
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, session, g
 
 from connexion_db import get_db
+#test merge
 
 client_coordonnee = Blueprint('client_coordonnee', __name__,
                         template_folder='templates')
