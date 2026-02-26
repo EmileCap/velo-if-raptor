@@ -36,7 +36,7 @@ types_article : tableau de dictionnaires
                     </label>                                         {# à modifier #}
 {#                https://blog.miguelgrinberg.com/post/handling-file-uploads-with-flask#}
 
-                <label for="type_article_id">Type de l'article :
+                <label for="type_article_id">Marque :
                     <select name="type_article_id" class="form-select">
                             {% for type in types_article %}
                                  <option value="{{ type.id_type_article }}" {% if type.id_type_article == article.type_article_id %} selected {% endif %}> {{ type.libelle }}</option>
