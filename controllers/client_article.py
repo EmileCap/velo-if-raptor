@@ -14,19 +14,34 @@ def client_article_show():                                 # remplace client_ind
     mycursor = get_db().cursor()
     id_client = session['id_user']
 
-    sql = """
-    SELECT id_velo AS id_article,
-        nom_velo AS nom,
-        prix_velo AS prix,
-        photo_velo AS photo,
-        stock_velo AS stock,
-        photo_velo AS image
-    FROM Velo
-    """
-    condition_and = ""
-    # utilisation du filtre
-    sql3=''' prise en compte des commentaires et des notes dans le SQL    '''
-    mycursor.execute(sql)
+    sql = """SELECT id_velo AS id_article, nom_velo AS nom,
+                    prix_velo AS prix, photo_velo AS image,
+                    stock_velo AS stock
+            FROM Velo WHERE 1=1"""
+    params = []
+
+    filter_word = session.get('filter_word', None)
+    if filter_word:
+        sql += " AND nom_velo LIKE %s"
+        params.append(f"%{filter_word}%")
+
+    filter_types = session.get('filter_types', [])
+    if filter_types:
+        placeholders = ', '.join(['%s'] * len(filter_types))
+        sql += f" AND id_type IN ({placeholders})"
+        params.extend(filter_types)
+
+    filter_prix_min = session.get('filter_prix_min', None)
+    if filter_prix_min:
+        sql += " AND prix_velo >= %s"
+        params.append(filter_prix_min)
+
+    filter_prix_max = session.get('filter_prix_max', None)
+    if filter_prix_max:
+        sql += " AND prix_velo <= %s"
+        params.append(filter_prix_max)
+
+    mycursor.execute(sql, params)
     articles = mycursor.fetchall()
 
     sql2 = ''' 
