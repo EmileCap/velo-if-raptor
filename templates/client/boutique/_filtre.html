@@ -1,37 +1,28 @@
-<form method="post"  action="/client/panier/filtre"  style="display: inline-block">
-    <div class="form-group">
-        <input name="filter_word"  type="text" placeholder="Recherche" size="10" class="form-control"
-               value="{% if session['filter_word'] %}{{ session['filter_word'] }}{% endif %}"  >
+<form action="/client/panier/filtre" method="post">
+    <div class="mb-2">
+        <label>Nom contient :</label>
+        <input type="text" name="filter_word" class="form-control" value="{{ session.get('filter_word', '') }}">
     </div>
-   {% if items_filtre is defined %}
-    <div class="form-group">
-        <h4>Types articles</h4>
-        {% for item_filtre in items_filtre %}
-        <input type="checkbox" name="filter_types" value="{{ item_filtre.id_type_article }}"
-               {% set id_item = item_filtre.id_type_article | string %}
-               {% if session['filter_types'] %}
-{#                   {%  if idItem in session['filter_types'] %} checked  {% endif %} #}
-                   {{ ' checked ' if (id_item in session['filter_types']) else '' }}
-               {% endif %}
-{#                https://stackoverflow.com/questions/58433775/how-to-access-the-value-of-each-checkbox-in-a-table-with-flask #}
-            >  {{ item_filtre.libelle_type}}
-            <br/>
-        {% endfor %}>
+    <div class="mb-2">
+        <label>Prix min (€) :</label>
+        <input type="number" name="filter_prix_min" class="form-control" value="{{ session.get('filter_prix_min', '') }}">
     </div>
-    {% endif %}
-
-    <div class="form-group">
-        <h5>Prix :</h5>
-         <input name="filter_prix_min"  type="text" placeholder="min"  size="3"
-            value="{% if session['filter_prix_min'] %}{{ session['filter_prix_min'] }}{% endif %}" >
-
-       <input name="filter_prix_max"  type="text" placeholder="max"  size="3"
-             value="{% if session['filter_prix_max'] %}{{ session['filter_prix_max'] }}{% endif %}" >
+    <div class="mb-2">
+        <label>Prix max (€) :</label>
+        <input type="number" name="filter_prix_max" class="form-control" value="{{ session.get('filter_prix_max', '') }}">
     </div>
-    <button type="submit" class="btn btn-primary" style="display: inline-block;">Filtrer</button>
+    <div class="mb-2">
+        <label>Type :</label>
+        {% for item in items_filtre %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="filter_types" value="{{ item.id_type_article }}"
+                    {% if session.get('filter_types') and item.id_type_article|string in session.get('filter_types') %}checked{% endif %}>
+                <label class="form-check-label">{{ item.libelle_type }}</label>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
 </form>
-{% if session['filter_word'] or session['filter_prix_max'] or session['filter_prix_min'] or session['filter_types']%}
-<form  action="/client/panier/filtre/suppr"  style="display: inline-block; margin: 5px;"  method="post" >
-<button class="btn btn-primary" > Supprimer filtre </button>
+<form action="/client/panier/filtre/suppr" method="post" class="mt-2">
+    <button type="submit" class="btn btn-secondary btn-sm">Effacer les filtres</button>
 </form>
-{% endif %}

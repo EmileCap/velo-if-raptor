@@ -12,4 +12,4 @@ fi
 
 # Lancer Flask
 echo "Démarrage du serveur Flask..."
-flask --debug --app app run --host 0.0.0.0 --port 5000
+flask --debug --app app run --host 0.0.0.0 --port 5001

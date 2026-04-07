@@ -1,104 +1,98 @@
 {% extends "admin/layout_admin.html" %}
 {% block body %}
-    <div class="container-fluid">
-        {% if articles_commande %}
-            <h3>Recapitulatifs de la commande selectionnée</h3>
-            <table class="table">
-                <thead class="thead-dark">
-                    <tr><th>Nom</th><th>Quantite</th><th>Prix</th><th>Prix total</th></tr>
+<div class="container-fluid">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="alert {{ cat }} alert-dismissible fade show mt-2" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if articles_commande %}
+        <h3>Détail de la commande sélectionnée</h3>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Article</th><th>Déclinaison</th><th>Quantité</th><th>Prix unit.</th><th>Total ligne</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in articles_commande %}
+                    <tr>
+                        <td>{{ ligne.nom }}</td>
+                        <td>
+                            {% if ligne.nb_declinaisons > 1 %}
+                                {% if ligne.id_taille != 1 %}
+                                    <span style="color:#d941c2">{{ ligne.libelle_taille }}</span>
+                                {% endif %}
+                                {% if ligne.id_couleur != 1 %}
+                                    <span style="color:#6dcea2"> {{ ligne.libelle_couleur }}</span>
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ ligne.quantite }}</td>
+                        <td>{{ ligne.prix }} €</td>
+                        <td><strong>{{ ligne.prix_ligne }} €</strong></td>
+                    </tr>
+                {% endfor %}
+                <tr class="table-success">
+                    <td colspan="4"><strong>Total commande</strong></td>
+                    <td><strong>{{ "{:,.2f} €".format(articles_commande | sum(attribute='prix_ligne')) }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <form action="/admin/commande/valider" style="display:inline-block;" method="post">
+            <input type="hidden" name="id_commande" value="{{ request.args.get('id_commande') }}">
+            <button class="btn btn-primary">Valider (Expédier)</button>
+        </form>
+        <hr>
+    {% endif %}
+
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <p class="text-primary m-0 font-weight-bold">Toutes les commandes</p>
+        </div>
+        <div class="card-body">
+            <table class="table my-0">
+                <thead>
+                    <tr>
+                        <th>Login client</th>
+                        <th>Date</th>
+                        <th>Nb articles</th>
+                        <th>Total</th>
+                        <th>État</th>
+                        <th style="text-align:center">Options</th>
+                    </tr>
                 </thead>
                 <tbody>
-                        {% for ligne in articles_commande %}
-                             <tr>
-                                <td>{{ ligne.nom }}
-                                {% if ligne.nb_declinaisons is defined and ligne.nb_declinaisons > 1 %}
-                                    <span style="color:rgba(255,197,197,0.6);"> ( {{ ligne.nb_declinaisons }} declinaisons )</span>
-                                    <span style="color:#6dcea2">
-                                    {% if ligne.couleur_id != 1 %}
-                                        {{ ligne.libelle_couleur }}
-                                    {% endif %}
-                                    </span>
-                                    <span  style="color:#d941c2">
-                                    {% if ligne.taille_id != 1 %}
-                                        {{ ligne.libelle_taille }}
-                                    {% endif %}
-                                    </span>
-                                {% endif %}
-                                </td>
-                                <td>{{ ligne.quantite }}</td>
-                                <td>{{ ligne.prix }} €</td>
-                                <td>{{ ligne.prix_ligne }} €  </td>
-                            </tr>
-                        {% endfor %}
-
+                {% for commande in commandes %}
+                    <tr {% if commande.etat_id == 1 %}class="table-warning" style="font-weight:bold;"{% endif %}>
+                        <td>{{ commande.login }}</td>
+                        <td>{{ commande.date_achat.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ commande.nbr_articles }}</td>
+                        <td>{{ "{:,.2f} €".format(commande.prix_total) }}</td>
+                        <td>{{ commande.libelle }}</td>
+                        <td style="text-align:center">
+                            <form action="/admin/commande/valider" style="display:inline-block;" method="post">
+                                <input type="hidden" name="id_commande" value="{{ commande.id_commande }}">
+                                <button class="btn btn-primary btn-sm">Expédier</button>
+                            </form>
+                            <a href="/admin/commande/show?id_commande={{ commande.id_commande }}">
+                                <button class="btn btn-info btn-sm">Détail</button>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
-               <br>
-                <div style="color: brown">
-                <strong>adresse livraison : </strong>{{ commande_adresses.nom_livraison }} {{ commande_adresses.rue_livraison }} {{ commande_adresses.code_postal_livraison }} {{ commande_adresses.ville_livraison }}
-                <br>
-                <strong>adresse facturation : </strong>
-                {% if commande_adresses.adresse_identique == 'adresse_identique' %}
-                    adresse identique
-                {% else %}
-                    {{ commande_adresses.nom_facturation }} {{ commande_adresses.rue_facturation }} {{ commande_adresses.code_postal_facturation }} {{ commande_adresses.ville_facturation }}
-                {% endif %}
-                </div>
-
-            {% if articles_commande[0].etat_id == 1 %}
-            <form action="/admin/commande/valider"  style="display: inline-block;"  method="post">
-                  <input type="hidden" name="idCommande" value="{{ articles_commande[0].id }}">
-                  <button class="btn btn-primary" > Valider (Expédier) </button>
-            </form>
-            {% endif %}
-            <hr>
-        {% endif %}
-
-        <div class="card shadow">
-            <div class="card-header py-3">
-                <p class="text-primary m-0 font-weight-bold">Toutes les commandes</p>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                    <table class="table my-0" id="dataTable">
-                        <thead>
-                        <tr>
-                            <th>login client</th>
-                            <th>Date de commande</th>
-                            <th>Nombre d'articles</th>
-                            <th>Coût total</th>
-                            <th>Etat de la commande</th>
-                            <th style="text-align: center;">Options</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for commande in commandes %}
-                            <tr id="" {% if commande.etat_id == 1 %} class="table-warning" style="font-weight: bold;"{% endif %}>
-                                <td>{{ commande.login }}</td>
-                                <td>{{ commande.date_achat.strftime('%d-%m-%Y') }}</td>
-                                <td> {{ commande.nbr_articles }} </td>
-                                <td>
-                                    {{ commande.prix_total }}
-                                </td>
-                                <td> {{ commande.libelle }}</td>
-                                <td style="text-align: center;">
-                                    <form action="/admin/commande/valider" style="display: inline-block;"  method="post">
-                                        <input type="hidden" name="id_commande" value="{{ commande.id_commande }}">
-                                        <button class="btn btn-primary" > Valider (Expédier) </button>
-                                    </form>
-                                    <a href="/admin/commande/show?id_commande={{ commande.id_commande }}">
-                                        <button class="btn btn-primary" > Details </button>
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-
-        </div>
         </div>
     </div>
+</div>
 {% endblock %}

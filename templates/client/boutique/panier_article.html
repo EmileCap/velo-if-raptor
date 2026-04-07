@@ -2,11 +2,10 @@
 {% block body %}
 <div class="container">
 
-    {# ── MESSAGES FLASH ── #}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for cat, msg in messages %}
-          <div class="alert alert-{{ cat }} alert-dismissible fade show mt-2" role="alert">
+          <div class="alert {{ cat }} alert-dismissible fade show mt-2" role="alert">
             {{ msg }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
@@ -14,28 +13,14 @@
       {% endif %}
     {% endwith %}
 
-    {# ══════════════════════════════════════════════════
-       LIGNE 1 : Panier (gauche) + Filtres (droite)
-       ══════════════════════════════════════════════════ #}
     <div class="row mt-3">
-
-        {# ── PANIER ── #}
-        <div class="col-8">
-            {% include('client/boutique/_panier.html') %}
-        </div>
-
-        {# ── FILTRES ── #}
+        {% include('client/boutique/_panier.html') %}
         <div class="col-4">
-            <h4>Les filtres</h4>
-            <p>Articles dont le nom est composé par :</p>
+            <h4>Filtres</h4>
             {% include('client/boutique/_filtre.html') %}
         </div>
-
     </div>
 
-    {# ══════════════════════════════════════════════════
-       LIGNE 2 : Liste des articles
-       ══════════════════════════════════════════════════ #}
     <div class="bg-light p-3 mt-4">
         <h1>Les articles</h1>
     </div>
@@ -46,75 +31,35 @@
                 <div class="card-body border-dark rounded p-1">
                     <a href="/client/article/details?id_article={{ article.id_article }}">
                         <h3 class="card-title">
-                            <span style="color: #0b2e13">{{ article.nom }}</span><br>
+                            <span style="color:#0b2e13">{{ article.nom }}</span><br>
                             {{ article.prix }} €
+                            {% if article.nb_declinaisons > 1 %}
+                                <small class="text-muted">({{ article.nb_declinaisons }} déclinaisons)</small>
+                            {% endif %}
                         </h3>
                         {% if article.image is not none %}
                             <img class="card-img-top rounded mx-auto d-block" style="width:100px;height:100px"
                                  src="{{ url_for('static', filename='images/') }}{{ article.image }}"
-                                 alt="image de {{ article.nom }}">
+                                 alt="{{ article.nom }}">
                         {% else %}
                             <img class="card-img-top rounded mx-auto d-block" style="width:100px;height:100px"
                                  src="{{ url_for('static', filename='images/no_photo.jpeg') }}"
-                                 alt="image de {{ article.nom }}">
+                                 alt="{{ article.nom }}">
                         {% endif %}
                         <hr>
                     </a>
-
                     <div class="row">
-                        {% if article.stock is defined and article.stock != None and article.stock > 0 %}
-                            <form action="/client/panier/add" method="post" class="col-5">
-                                <input type="hidden" name="id_article" value="{{ article.id_article }}">
-                                <div class="input-group">
-                                    <button class="btn btn-success" type="submit">
-                                        <i>Ajouter</i>
-                                    </button>
-                                    <input type="number"
-                                           step="1" min="1" max="{{ article.stock }}"
-                                           class="form-control"
-                                           value="1"
-                                           name="quantite">
-                                </div>
-                            </form>
+                        {% if article.stock > 0 %}
+                            <a href="/client/panier/declinaison?id_article={{ article.id_article }}"
+                               class="btn btn-success col-5">Ajouter</a>
                         {% endif %}
-
-                        <div class="col-2 align-content-end">
-                            {% if article.liste_envie is defined %}
-                                {% if article.liste_envie == 1 %}
-                                    <a href="/client/envie/add?id_article={{ article.id_article }}" style="text-decoration:none">💛</a>
-                                {% else %}
-                                    <a href="/client/envie/add?id_article={{ article.id_article }}" style="text-decoration:none">🤍</a>
-                                {% endif %}
-                            {% endif %}
-                        </div>
                     </div>
                 </div>
-
                 <div class="card-footer">
-                    {% if article.stock is defined and article.stock != None %}
-                        {% if article.stock > 0 %}
-                            <small class="text-muted">Stock restant : {{ article.stock }}</small>
-                        {% else %}
-                            <small class="text-muted">article momentanément indisponible</small>
-                        {% endif %}
-                        {% if article.nb_declinaison is defined and article.nb_declinaison != None %}
-                            ({{ article.nb_declinaison }} d.)
-                        {% endif %}
-                        <br>
-                    {% endif %}
-                    {% if article.nb_notes is defined %}
-                        {% if article.nb_notes > 0 %}
-                            <a href="/client/article/details?id_article={{ article.id_article }}">
-                                <span style="color: #3A7734"> note : {{ "{:,.1f}".format(article.moy_notes) }}({{ article.nb_notes }})</span>
-                            </a>
-                        {% endif %}
-                    {% endif %}
-                    {% if article.nb_avis is defined %}
-                        {% if article.nb_avis > 0 %}
-                            <a href="/client/article/details?id_article={{ article.id_article }}">
-                                <span style="color: #3A7734">({{ article.nb_avis }} avis)</span>
-                            </a>
-                        {% endif %}
+                    {% if article.stock > 0 %}
+                        <small class="text-muted">Stock : {{ article.stock }}</small>
+                    {% else %}
+                        <small class="text-muted">Momentanément indisponible</small>
                     {% endif %}
                 </div>
             </div>

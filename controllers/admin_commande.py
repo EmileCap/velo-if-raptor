@@ -1,13 +1,13 @@
 #! /usr/bin/python
 # -*- coding:utf-8 -*-
-#Test Merge
 from flask import Blueprint
-from flask import Flask, request, render_template, redirect, flash, session
+from flask import request, render_template, redirect, flash, session
 
 from connexion_db import get_db
 
 admin_commande = Blueprint('admin_commande', __name__,
-                        template_folder='templates')
+                           template_folder='templates')
+
 
 @admin_commande.route('/admin')
 @admin_commande.route('/admin/commande/index')
@@ -15,74 +15,57 @@ def admin_index():
     return render_template('admin/layout_admin.html')
 
 
-@admin_commande.route('/admin/commande/show', methods=['get','post'])
+@admin_commande.route('/admin/commande/show', methods=['GET', 'POST'])
 def admin_commande_show():
     mycursor = get_db().cursor()
-    admin_id = session['id_user']
-    sql = ''' 
-    SELECT 
-        commande.id_commande,
-        utilisateur.login,
-        commande.date_achat,
-        COUNT(ligne_commande.article_id) AS nbr_articles,
-        SUM(ligne_commande.quantite) AS prix_total,
-        etat.libelle_etat AS libelle
-    FROM commande
-    INNER JOIN utilisateur 
-        ON commande.utilisateur_id = utilisateur.id_utilisateur
-    INNER JOIN ligne_commande 
-        ON commande.id_commande = ligne_commande.commande_id
-    INNER JOIN etat 
-        ON commande.etat_id = etat.id_etat
-    GROUP BY 
-        commande.id_commande,
-        utilisateur.login,
-        commande.date_achat,
-        etat.libelle_etat;
-    '''
 
+    sql = """
+    SELECT c.id_commande, u.login, c.date_achat, c.etat_id, e.libelle_etat AS libelle,
+           COUNT(lc.id_declinaison)       AS nbr_articles,
+           SUM(lc.prix * lc.quantite)     AS prix_total
+    FROM commande c
+    INNER JOIN utilisateur u      ON u.id_utilisateur = c.utilisateur_id
+    INNER JOIN ligne_commande lc  ON lc.commande_id = c.id_commande
+    INNER JOIN etat e             ON e.id_etat = c.etat_id
+    GROUP BY c.id_commande, u.login, c.date_achat, c.etat_id, e.libelle_etat
+    ORDER BY c.etat_id ASC, c.date_achat DESC
+    """
     mycursor.execute(sql)
-
-    commandes= mycursor.fetchall()
+    commandes = mycursor.fetchall()
 
     articles_commande = None
-    commande_adresses = None
     id_commande = request.args.get('id_commande', None)
-    print(id_commande)
-    if id_commande != None:
 
-        sql = '''
-    SELECT nom_velo as nom, quantite, prix, SUM(prix*quantite) AS prix_ligne
-    FROM commande
-    INNER JOIN ligne_commande ON id_commande = commande_id
-    INNER JOIN Velo ON article_id = id_velo
-    WHERE id_commande = %s
-    GROUP BY id_velo, nom_velo, quantite, prix;
-    '''
-        mycursor.execute(sql, id_commande)
+    if id_commande is not None:
+        sql_detail = """
+        SELECT v.nom_velo AS nom, lc.quantite, lc.prix,
+               lc.prix * lc.quantite AS prix_ligne,
+               d.id_taille, t.libelle_taille,
+               d.id_couleur, c2.libelle_couleur,
+               (SELECT COUNT(*) FROM declinaison d2
+                WHERE d2.id_velo = v.id_velo AND d2.valide = 1) AS nb_declinaisons
+        FROM ligne_commande lc
+        INNER JOIN declinaison d  ON d.id_declinaison = lc.id_declinaison
+        INNER JOIN Velo v         ON v.id_velo = d.id_velo
+        INNER JOIN taille t       ON t.id_taille = d.id_taille
+        INNER JOIN couleur c2     ON c2.id_couleur = d.id_couleur
+        WHERE lc.commande_id = %s
+        """
+        mycursor.execute(sql_detail, (id_commande,))
         articles_commande = mycursor.fetchall()
-        
 
-        sql = '''    '''
-        commande_adresses = []
-    return render_template('admin/commandes/show.html'
-                           , commandes=commandes
-                           , articles_commande=articles_commande
-                           , commande_adresses=commande_adresses
-                           )
+    return render_template('admin/commandes/show.html',
+                           commandes=commandes,
+                           articles_commande=articles_commande,
+                           commande_adresses=None)
 
 
-@admin_commande.route('/admin/commande/valider', methods=['get','post'])
+@admin_commande.route('/admin/commande/valider', methods=['GET', 'POST'])
 def admin_commande_valider():
     mycursor = get_db().cursor()
     commande_id = request.form.get('id_commande', None)
-    if commande_id != None:
-        print(commande_id)
-        sql = '''   UPDATE etat
-            INNER JOIN commande
-                ON etat.id_etat = commande.etat_id 
-            SET libelle_etat = "Expédié"
-            WHERE id_commande = %s    '''
-        mycursor.execute(sql, commande_id)
+    if commande_id is not None:
+        mycursor.execute("UPDATE commande SET etat_id = 2 WHERE id_commande = %s", (commande_id,))
         get_db().commit()
+        flash("Commande expédiée.", "alert-success")
     return redirect('/admin/commande/show')
