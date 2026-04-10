@@ -74,27 +74,73 @@ def show_type_article_stock():
 
 @admin_dataviz.route('/admin/dataviz/etat2')
 def show_dataviz_map():
+    adresses = [{'dep': '25', 'nombre': 1}, {'dep': '83', 'nombre': 1}, {'dep': '90', 'nombre': 3}]
+    return render_template('admin/dataviz/dataviz_etat_map.html', adresses=adresses)
+
+
+@admin_dataviz.route('/admin/dataviz/commentaires')
+def show_dataviz_commentaires():
     mycursor = get_db().cursor()
 
     mycursor.execute("""
-        SELECT LEFT(a.code_postal, 2) AS departement,
-               COUNT(c.id_commande) AS nb_ventes,
-               SUM(lc.prix * lc.quantite) AS chiffre_affaires
-        FROM commande c
-        INNER JOIN adresse a ON a.id_adresse = c.id_adresse_livraison
-        INNER JOIN ligne_commande lc ON lc.commande_id = c.id_commande
-        GROUP BY LEFT(a.code_postal, 2)
-        ORDER BY nb_ventes DESC
+        SELECT t.id_type, t.libelle_type,
+               COUNT(DISTINCT n.id_utilisateur) AS nb_notes,
+               AVG(n.note)                       AS moyenne_notes,
+               COUNT(DISTINCT CASE WHEN c.id_commentaire_parent IS NULL
+                                   THEN c.id_commentaire END) AS nb_commentaires
+        FROM type t
+        LEFT JOIN Velo v ON v.id_type = t.id_type
+        LEFT JOIN note n ON n.id_velo = v.id_velo
+        LEFT JOIN commentaire c ON c.id_velo = v.id_velo
+        GROUP BY t.id_type, t.libelle_type
+        ORDER BY t.id_type
     """)
-    stats_dep = mycursor.fetchall()
+    stats_types = mycursor.fetchall()
 
-    labels = [r['departement'] for r in stats_dep]
-    values_ventes = [int(r['nb_ventes']) for r in stats_dep]
-    values_ca = [int(r['chiffre_affaires']) if r['chiffre_affaires'] else 0 for r in stats_dep]
+    id_type_sel = request.args.get('id_type', None)
+    stats_articles = []
+    libelle_type_sel = None
 
-    return render_template('admin/dataviz/dataviz_etat_map.html',
-                           stats_dep=stats_dep,
-                           labels=labels,
-                           values_ventes=values_ventes,
-                           values_ca=values_ca
-                           )
+    if id_type_sel:
+        mycursor.execute("""
+            SELECT v.id_velo, v.nom_velo,
+                   COUNT(DISTINCT n.id_utilisateur) AS nb_notes,
+                   AVG(n.note)                       AS moyenne_notes,
+                   COUNT(DISTINCT CASE WHEN c.id_commentaire_parent IS NULL
+                                       THEN c.id_commentaire END) AS nb_commentaires
+            FROM Velo v
+            LEFT JOIN note n ON n.id_velo = v.id_velo
+            LEFT JOIN commentaire c ON c.id_velo = v.id_velo
+            WHERE v.id_type = %s
+            GROUP BY v.id_velo, v.nom_velo
+            ORDER BY v.nom_velo
+        """, (id_type_sel,))
+        stats_articles = mycursor.fetchall()
+
+        mycursor.execute("SELECT libelle_type FROM type WHERE id_type = %s", (id_type_sel,))
+        row = mycursor.fetchone()
+        libelle_type_sel = row['libelle_type'] if row else ''
+
+    labels_types  = [r['libelle_type'] for r in stats_types]
+    values_moy    = [round(float(r['moyenne_notes']), 2) if r['moyenne_notes'] else 0 for r in stats_types]
+    values_com    = [int(r['nb_commentaires']) for r in stats_types]
+    values_notes  = [int(r['nb_notes']) for r in stats_types]
+
+    labels_arts      = [r['nom_velo'] for r in stats_articles]
+    values_art_moy   = [round(float(r['moyenne_notes']), 2) if r['moyenne_notes'] else 0 for r in stats_articles]
+    values_art_com   = [int(r['nb_commentaires']) for r in stats_articles]
+    values_art_notes = [int(r['nb_notes']) for r in stats_articles]
+
+    return render_template('admin/dataviz/dataviz_commentaires.html',
+                           stats_types=stats_types,
+                           stats_articles=stats_articles,
+                           id_type_sel=id_type_sel,
+                           libelle_type_sel=libelle_type_sel,
+                           labels_types=labels_types,
+                           values_moy=values_moy,
+                           values_com=values_com,
+                           values_notes=values_notes,
+                           labels_arts=labels_arts,
+                           values_art_moy=values_art_moy,
+                           values_art_com=values_art_com,
+                           values_art_notes=values_art_notes)

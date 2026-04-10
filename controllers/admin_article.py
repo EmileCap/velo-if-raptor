@@ -11,7 +11,7 @@ from connexion_db import get_db
 admin_article = Blueprint('admin_article', __name__,
                           template_folder='templates')
 
-
+#on montre les commentaires au admins pour qu'ils puissent les valider
 @admin_article.route('/admin/article/show')
 def show_article():
     mycursor = get_db().cursor()
@@ -19,12 +19,19 @@ def show_article():
     SELECT v.nom_velo AS nom, v.id_velo AS id_article, v.prix_velo AS prix,
            v.id_type AS type_article_id, t.libelle_type AS libelle,
            v.photo_velo AS image,
-           COALESCE(SUM(d.stock), 0) AS stock,
-           COUNT(d.id_declinaison)   AS nb_declinaisons,
-           MIN(d.stock)              AS min_stock
+           COALESCE(SUM(DISTINCT d.stock), 0) AS stock,
+           COUNT(DISTINCT d.id_declinaison)   AS nb_declinaisons,
+           MIN(d.stock)                       AS min_stock,
+           COUNT(DISTINCT CASE WHEN c.valider = 0 AND c.id_commentaire_parent IS NULL
+                               THEN c.id_commentaire END) AS nb_commentaires_nouveaux,
+           COUNT(DISTINCT CASE WHEN c.id_commentaire_parent IS NULL
+                               THEN c.id_commentaire END) AS nb_commentaires_total,
+           COUNT(DISTINCT CASE WHEN c.valider = 1 AND c.id_commentaire_parent IS NULL
+                               THEN c.id_commentaire END) AS nb_commentaires_valides
     FROM Velo v
     INNER JOIN type t ON v.id_type = t.id_type
     LEFT  JOIN declinaison d ON d.id_velo = v.id_velo AND d.valide = 1
+    LEFT  JOIN commentaire c ON c.id_velo = v.id_velo
     GROUP BY v.id_velo, v.nom_velo, v.prix_velo, v.id_type, t.libelle_type, v.photo_velo
     ORDER BY v.id_velo
     """

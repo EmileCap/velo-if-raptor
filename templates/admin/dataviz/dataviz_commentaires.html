@@ -1,0 +1,130 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block javascripts_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+{% endblock %}
+
+{% block title %}<title>Dataviz Commentaires</title>{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-3">
+  <h2>Visualisation des commentaires et notes</h2>
+  <hr>
+
+  <h4>Par catégorie (type d'article)</h4>
+  <table class="table table-bordered table-sm table-hover mb-4">
+    <thead class="table-dark">
+      <tr>
+        <th>Catégorie</th>
+        <th class="text-center">Nb notes</th>
+        <th class="text-center">Note moyenne</th>
+        <th class="text-center">Nb commentaires</th>
+        <th class="text-center">Détail</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in stats_types %}
+      <tr {% if id_type_sel and id_type_sel|int == r.id_type %}class="table-primary"{% endif %}>
+        <td><strong>{{ r.libelle_type }}</strong></td>
+        <td class="text-center">{{ r.nb_notes }}</td>
+        <td class="text-center">
+          {% if r.moyenne_notes %}★ {{ "%.2f"|format(r.moyenne_notes) }} / 5{% else %}—{% endif %}
+        </td>
+        <td class="text-center">{{ r.nb_commentaires }}</td>
+        <td class="text-center">
+          <a href="/admin/dataviz/commentaires?id_type={{ r.id_type }}"
+             class="btn btn-sm btn-outline-primary">Voir détail</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <h6 class="text-center">Note moyenne / catégorie</h6>
+      <canvas id="chartMoyType" height="220"></canvas>
+    </div>
+    <div class="col-md-4">
+      <h6 class="text-center">Nb commentaires / catégorie</h6>
+      <canvas id="chartComType" height="220"></canvas>
+    </div>
+    <div class="col-md-4">
+      <h6 class="text-center">Nb notes / catégorie</h6>
+      <canvas id="chartNotesType" height="220"></canvas>
+    </div>
+  </div>
+
+  {% if id_type_sel %}
+  <hr>
+  <h4>Détail : <span class="text-primary">{{ libelle_type_sel }}</span></h4>
+  {% if stats_articles %}
+  <table class="table table-bordered table-sm table-hover mb-4">
+    <thead class="table-secondary">
+      <tr>
+        <th>Article</th>
+        <th class="text-center">Nb notes</th>
+        <th class="text-center">Note moyenne</th>
+        <th class="text-center">Nb commentaires</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in stats_articles %}
+      <tr>
+        <td>{{ r.nom_velo }}</td>
+        <td class="text-center">{{ r.nb_notes }}</td>
+        <td class="text-center">
+          {% if r.moyenne_notes %}★ {{ "%.2f"|format(r.moyenne_notes) }} / 5{% else %}—{% endif %}
+        </td>
+        <td class="text-center">{{ r.nb_commentaires }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <h6 class="text-center">Note moyenne / article</h6>
+      <canvas id="chartMoyArt" height="250"></canvas>
+    </div>
+    <div class="col-md-4">
+      <h6 class="text-center">Nb commentaires / article</h6>
+      <canvas id="chartComArt" height="250"></canvas>
+    </div>
+    <div class="col-md-4">
+      <h6 class="text-center">Nb notes / article</h6>
+      <canvas id="chartNotesArt" height="250"></canvas>
+    </div>
+  </div>
+  {% else %}
+    <p class="text-muted">Aucune donnée pour cette catégorie.</p>
+  {% endif %}
+  {% endif %}
+
+  <a href="/admin/article/show" class="btn btn-outline-secondary">← Retour articles</a>
+</div>
+
+<script>
+function makeBar(id, labels, data, label, color) {
+  var ctx = document.getElementById(id);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: { labels: labels, datasets: [{ label: label, data: data,
+        backgroundColor: color, borderColor: color, borderWidth: 1 }] },
+    options: { responsive: true,
+      scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+      legend: { display: false } }
+  });
+}
+
+makeBar('chartMoyType',   {{ labels_types|tojson }}, {{ values_moy|tojson }},   'Note moyenne',    'rgba(255,193,7,0.7)');
+makeBar('chartComType',   {{ labels_types|tojson }}, {{ values_com|tojson }},   'Nb commentaires', 'rgba(13,110,253,0.7)');
+makeBar('chartNotesType', {{ labels_types|tojson }}, {{ values_notes|tojson }}, 'Nb notes',        'rgba(25,135,84,0.7)');
+
+{% if id_type_sel and stats_articles %}
+makeBar('chartMoyArt',   {{ labels_arts|tojson }}, {{ values_art_moy|tojson }},   'Note moyenne',    'rgba(255,193,7,0.8)');
+makeBar('chartComArt',   {{ labels_arts|tojson }}, {{ values_art_com|tojson }},   'Nb commentaires', 'rgba(13,110,253,0.8)');
+makeBar('chartNotesArt', {{ labels_arts|tojson }}, {{ values_art_notes|tojson }}, 'Nb notes',        'rgba(25,135,84,0.8)');
+{% endif %}
+</script>
+{% endblock %}

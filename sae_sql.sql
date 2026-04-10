@@ -1,3 +1,7 @@
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS note;
+DROP TABLE IF EXISTS commentaire;
+
 DROP TABLE IF EXISTS ligne_panier;
 DROP TABLE IF EXISTS ligne_commande;
 DROP TABLE IF EXISTS commande;
@@ -9,6 +13,7 @@ DROP TABLE IF EXISTS etat;
 DROP TABLE IF EXISTS utilisateur;
 DROP TABLE IF EXISTS taille;
 DROP TABLE IF EXISTS type;
+
 
 CREATE TABLE utilisateur (
     id_utilisateur INT PRIMARY KEY AUTO_INCREMENT,
@@ -176,10 +181,7 @@ INSERT INTO declinaison(id_taille, id_couleur, stock, id_velo, prix_declinaison,
 (1,7,2,15,NULL,1),(1,2,2,15,NULL,1),
 (4,3,3,16,NULL,1),(5,3,3,16,NULL,1);
 
-UPDATE Velo SET stock_velo = (
-    SELECT COALESCE(SUM(d.stock),0) FROM declinaison d
-    WHERE d.id_velo = Velo.id_velo AND d.valide = 1
-);
+-- stock_velo recalculé à l'exécution
 
 INSERT INTO commande(id_commande, date_achat, utilisateur_id, etat_id) VALUES
 (1,'2026-02-05',2,1),(2,'2026-02-01',3,3);
@@ -191,7 +193,50 @@ UPDATE declinaison SET stock = stock - 2 WHERE id_declinaison = 1;
 UPDATE declinaison SET stock = stock - 1 WHERE id_declinaison = 4;
 UPDATE declinaison SET stock = stock - 1 WHERE id_declinaison = 6;
 
-UPDATE Velo SET stock_velo = (
-    SELECT COALESCE(SUM(d.stock),0) FROM declinaison d
-    WHERE d.id_velo = Velo.id_velo AND d.valide = 1
+-- stock_velo recalculé à l'exécution
+
+CREATE TABLE commentaire (
+    id_commentaire     INT PRIMARY KEY AUTO_INCREMENT,
+    commentaire        TEXT NOT NULL,
+    date_publication   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    valider            TINYINT(1) NOT NULL DEFAULT 0,
+    id_velo            INT NOT NULL,
+    id_utilisateur     INT NOT NULL,
+    id_commentaire_parent INT DEFAULT NULL,
+    FOREIGN KEY(id_velo)               REFERENCES Velo(id_velo),
+    FOREIGN KEY(id_utilisateur)        REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY(id_commentaire_parent) REFERENCES commentaire(id_commentaire)
 );
+
+CREATE TABLE note (
+    id_utilisateur INT NOT NULL,
+    id_velo        INT NOT NULL,
+    note           INT NOT NULL,
+    PRIMARY KEY(id_utilisateur, id_velo),
+    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY(id_velo)        REFERENCES Velo(id_velo)
+);
+
+INSERT INTO note(id_utilisateur, id_velo, note) VALUES
+(2,1,5),(2,2,4),(2,3,3),(2,7,5),(2,9,2),
+(3,1,4),(3,3,5),(3,4,3),(3,6,4),(3,9,3);
+
+INSERT INTO commentaire(id_commentaire,commentaire,date_publication,valider,id_velo,id_utilisateur,id_commentaire_parent) VALUES
+(1,'Excellent vélo de route, très confortable sur longue distance.','2026-02-10 10:00:00',1,1,2,NULL),
+(2,'Bon rapport qualité/prix pour ce niveau de gamme.','2026-02-12 14:30:00',1,1,2,NULL),
+(3,'Légèreté impressionnante, je recommande !','2026-03-01 09:00:00',0,1,2,NULL),
+(4,'Très bonne rigidité en montée.','2026-02-20 11:00:00',1,1,3,NULL),
+(5,'Merci pour votre retour ! N''hésitez pas à consulter nos accessoires.','2026-02-11 08:00:00',1,1,1,1),
+(6,'Parfait pour le gravel, très polyvalent.','2026-02-15 16:00:00',1,2,2,NULL),
+(7,'Les pneus 40mm passent partout.','2026-03-05 12:00:00',0,2,2,NULL),
+(8,'Bon VTT pour débuter, solide et maniable.','2026-02-18 09:30:00',1,3,3,NULL),
+(9,'Idéal pour les sentiers débutants.','2026-03-10 15:00:00',0,3,3,NULL),
+(10,'Merci ! Pensez à vérifier la pression des pneus régulièrement.','2026-02-19 10:00:00',1,3,1,8),
+(11,'Super vélo électrique, assistance très naturelle.','2026-03-01 10:00:00',0,5,2,NULL),
+(12,'Exceptionnel mais hors de prix...','2026-03-08 08:00:00',1,7,2,NULL),
+(13,'Bon hardtail, rigide et efficace.','2026-03-12 11:00:00',0,9,2,NULL),
+(14,'La transmission Shimano est excellente.','2026-03-14 14:00:00',0,9,3,NULL),
+(15,'Absolument, la géométrie est optimisée pour la performance !','2026-02-21 09:00:00',1,1,1,4);
+
+
+SET FOREIGN_KEY_CHECKS = 1;

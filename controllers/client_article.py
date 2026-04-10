@@ -15,6 +15,7 @@ def client_article_show():
     mycursor = get_db().cursor()
     id_client = session['id_user']
 
+    #on ajoute les notes des vélos et les commentaire aux articles
     sql = """
     SELECT
         v.id_velo    AS id_article,
@@ -22,12 +23,17 @@ def client_article_show():
         v.photo_velo AS image,
         v.id_type    AS id_type,
         t.libelle_type,
-        COUNT(d.id_declinaison)                        AS nb_declinaisons,
-        COALESCE(SUM(d.stock), 0)                      AS stock,
-        MIN(COALESCE(d.prix_declinaison, v.prix_velo)) AS prix
+        COUNT(DISTINCT d.id_declinaison) AS nb_declinaisons,
+        COALESCE(SUM(DISTINCT d.stock), 0) AS stock,
+        MIN(COALESCE(d.prix_declinaison, v.prix_velo)) AS prix,
+        AVG(n.note) AS moyenne_notes,
+        COUNT(DISTINCT n.id_utilisateur) AS nb_notes,
+        COUNT(DISTINCT c.id_commentaire) AS nb_commentaires
     FROM Velo v
     INNER JOIN type t ON v.id_type = t.id_type
     LEFT  JOIN declinaison d ON d.id_velo = v.id_velo AND d.valide = 1
+    LEFT  JOIN note n ON n.id_velo = v.id_velo
+    LEFT  JOIN commentaire c ON c.id_velo = v.id_velo AND c.id_commentaire_parent IS NULL
     WHERE 1=1
     """
     params = []

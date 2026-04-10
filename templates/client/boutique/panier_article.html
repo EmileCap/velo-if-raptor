@@ -61,6 +61,13 @@
                     {% else %}
                         <small class="text-muted">Momentanément indisponible</small>
                     {% endif %}
+                    {% if article.nb_notes is defined and article.nb_notes and article.nb_notes > 0 %}
+                        <br><small class="text-warning"> {{ "%.1f"|format(article.moyenne_notes) }}/5
+                        <span class="text-muted">({{ article.nb_notes }} note(s))</span></small>
+                    {% endif %}
+                    {% if article.nb_commentaires is defined and article.nb_commentaires and article.nb_commentaires > 0 %}
+                        <br><small class="text-muted"> {{ article.nb_commentaires }} avis</small>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

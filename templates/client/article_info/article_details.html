@@ -1,0 +1,165 @@
+{% extends "client/layout_client.html" %}
+{% block body %}
+<div class="container mt-3">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert {{ cat }} alert-dismissible fade show" role="alert" style="font-size:1.1rem;font-weight:bold;">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="row mb-4">
+    <div class="col-md-4 text-center">
+      {% if article.image %}
+        <img src="{{ url_for('static', filename='images/' + article.image) }}"
+             alt="{{ article.nom }}" class="img-fluid rounded" style="max-height:250px;">
+      {% endif %}
+    </div>
+    <div class="col-md-8">
+      <h2>{{ article.nom }}</h2>
+      <p class="text-muted">{{ article.libelle_type }}</p>
+      <h4 class="text-success">{{ article.prix }} €</h4>
+      {% if article.description %}<p>{{ article.description }}</p>{% endif %}
+
+      <!-- Note moyenne -->
+      {% if article.nb_notes and article.nb_notes > 0 %}
+        <div class="mb-2">
+          <span class="text-warning fs-5">
+            {% for i in range(1, 6) %}
+              {% if i <= article.moyenne_notes|round(0,'ceil')|int %}★{% else %}☆{% endif %}
+            {% endfor %}
+          </span>
+          <strong>{{ "%.1f"|format(article.moyenne_notes) }} / 5</strong>
+          <span class="text-muted">({{ article.nb_notes }} note(s))</span>
+        </div>
+      {% endif %}
+
+      <div class="mb-2 small text-muted">
+        {% if nb_commentaires %}
+           {{ nb_commentaires.nb_commentaires_total }} commentaire(s) total
+          |  {{ nb_commentaires.nb_commentaires_valides }} validé(s)
+          | Vous : {{ nb_commentaires.nb_commentaires_user }} commentaire(s)
+          ({{ nb_commentaires.nb_commentaires_user_valides }} validé(s))
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if commandes_articles and commandes_articles.nb > 0 %}
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header bg-warning text-dark"><strong>Votre note</strong></div>
+        <div class="card-body">
+          {% if note is not none %}
+            <p>Votre note actuelle : <strong class="text-warning">
+              {% for i in range(1,6) %}{% if i <= note %}★{% else %}☆{% endif %}{% endfor %}
+              ({{ note }}/5)
+            </strong></p>
+            <form method="post" action="/client/note/edit" class="d-inline">
+              <input type="hidden" name="id_article" value="{{ article.id_article }}">
+              <select name="note" class="form-select form-select-sm d-inline w-auto">
+                {% for i in range(1,6) %}
+                  <option value="{{ i }}" {% if i == note %}selected{% endif %}>{{ i }} ★</option>
+                {% endfor %}
+              </select>
+              <button class="btn btn-sm btn-warning">Modifier</button>
+            </form>
+            <form method="post" action="/client/note/delete" class="d-inline">
+              <input type="hidden" name="id_article" value="{{ article.id_article }}">
+              <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+            </form>
+          {% else %}
+            <form method="post" action="/client/note/add">
+              <input type="hidden" name="id_article" value="{{ article.id_article }}">
+              <label class="form-label">Donnez une note :</label>
+              <div class="d-flex align-items-center gap-2">
+                <select name="note" class="form-select form-select-sm w-auto">
+                  {% for i in range(1,6) %}
+                    <option value="{{ i }}">{{ i }} ★</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-sm btn-warning">Envoyer</button>
+              </div>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white"><strong>Ajouter un commentaire</strong>
+          {% if nb_commentaires %}
+            <span class="badge bg-light text-dark ms-2">{{ nb_commentaires.nb_commentaires_user }}/3</span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {% if nb_commentaires and nb_commentaires.nb_commentaires_user >= 3 %}
+            <div class="alert alert-danger fw-bold">⚠️ QUOTA ATTEINT : vous avez posté 3 commentaires (maximum autorisé).</div>
+          {% else %}
+            <form method="post" action="/client/commentaire/add">
+              <input type="hidden" name="id_article" value="{{ article.id_article }}">
+              <textarea name="commentaire" class="form-control mb-2" rows="3"
+                        placeholder="Votre commentaire..."></textarea>
+              <button class="btn btn-primary">Publier</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+    <div class="alert alert-info">
+      💡 Vous devez avoir acheté cet article pour pouvoir laisser un avis ou une note.
+    </div>
+  {% endif %}
+
+  <h4 class="mb-3">Commentaires</h4>
+  {% if commentaires %}
+    {% for c in commentaires %}
+      {% if c.id_commentaire_parent is none %}
+        <div class="card mb-2 border-secondary">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <strong>{{ c.nom }}</strong>
+              <small class="text-muted">{{ c.date_publication }} — #{{ c.id_commentaire }}</small>
+            </div>
+            <p class="mb-1 mt-1">{{ c.commentaire }}</p>
+            {% if c.id_utilisateur == session['id_user'] %}
+              <form method="post" action="/client/commentaire/delete" class="d-inline">
+                <input type="hidden" name="id_article" value="{{ article.id_article }}">
+                <input type="hidden" name="id_commentaire" value="{{ c.id_commentaire }}">
+                <button class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Supprimer ce commentaire ?')">Supprimer</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+        {% for reply in commentaires %}
+          {% if reply.id_commentaire_parent == c.id_commentaire %}
+            <div class="card mb-2 ms-4 border-success bg-success bg-opacity-10">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <strong class="text-success">↩ {{ reply.nom }} (Administrateur)</strong>
+                  <small class="text-muted">{{ reply.date_publication }}</small>
+                </div>
+                <p class="mb-0 mt-1">{{ reply.commentaire }}</p>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">Aucun commentaire pour cet article.</p>
+  {% endif %}
+
+  <a href="/client/article/show" class="btn btn-outline-secondary mt-3">← Retour à la boutique</a>
+</div>
+{% endblock %}
