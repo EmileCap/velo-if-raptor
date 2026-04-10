@@ -74,5 +74,27 @@ def show_type_article_stock():
 
 @admin_dataviz.route('/admin/dataviz/etat2')
 def show_dataviz_map():
-    adresses = [{'dep': '25', 'nombre': 1}, {'dep': '83', 'nombre': 1}, {'dep': '90', 'nombre': 3}]
-    return render_template('admin/dataviz/dataviz_etat_map.html', adresses=adresses)
+    mycursor = get_db().cursor()
+
+    mycursor.execute("""
+        SELECT LEFT(a.code_postal, 2) AS departement,
+               COUNT(c.id_commande) AS nb_ventes,
+               SUM(lc.prix * lc.quantite) AS chiffre_affaires
+        FROM commande c
+        INNER JOIN adresse a ON a.id_adresse = c.id_adresse_livraison
+        INNER JOIN ligne_commande lc ON lc.commande_id = c.id_commande
+        GROUP BY LEFT(a.code_postal, 2)
+        ORDER BY nb_ventes DESC
+    """)
+    stats_dep = mycursor.fetchall()
+
+    labels = [r['departement'] for r in stats_dep]
+    values_ventes = [int(r['nb_ventes']) for r in stats_dep]
+    values_ca = [int(r['chiffre_affaires']) if r['chiffre_affaires'] else 0 for r in stats_dep]
+
+    return render_template('admin/dataviz/dataviz_etat_map.html',
+                           stats_dep=stats_dep,
+                           labels=labels,
+                           values_ventes=values_ventes,
+                           values_ca=values_ca
+                           )

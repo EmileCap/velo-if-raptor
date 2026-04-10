@@ -41,16 +41,41 @@ def client_commande_valide():
     row = mycursor.fetchone()
     prix_total = row['total'] if row else None
 
+    mycursor.execute(
+        """
+        SELECT id_adresse, nom, rue, code_postal, ville, favori
+        FROM adresse
+        WHERE utilisateur_id = %s AND valide = 1
+        ORDER BY favori DESC, id_adresse ASC
+        """,
+        (id_client,)
+    )
+    adresses = mycursor.fetchall()
+
     return render_template('client/boutique/panier_validation_adresses.html',
                            articles_panier=articles_panier,
                            prix_total=prix_total,
+                           adresses=adresses,
                            validation=1)
-
 
 @client_commande.route('/client/commande/add', methods=['POST'])
 def client_commande_add():
     mycursor = get_db().cursor()
     id_client = session['id_user']
+    id_adresse_livraison = request.form.get('id_adresse_livraison')
+    id_adresse_facturation = request.form.get('id_adresse_facturation')
+
+    if not id_adresse_livraison:
+        flash("Veuillez sélectionner une adresse de livraison.", "alert-warning")
+        return redirect('/client/commande/valide')
+
+    mycursor.execute(
+        "SELECT COUNT(*) AS nb FROM adresse WHERE id_adresse = %s AND utilisateur_id = %s AND valide = 1",
+        (id_adresse_livraison, id_client)
+    )
+    if mycursor.fetchone()['nb'] == 0:
+        flash("Adresse de livraison invalide.", "alert-danger")
+        return redirect('/client/article/show')
 
     sql = """
         SELECT lp.id_declinaison, lp.quantite,
@@ -67,10 +92,12 @@ def client_commande_add():
         flash("Votre panier est vide.", "alert-warning")
         return redirect('/client/article/show')
 
+    id_adresse_fact = id_adresse_facturation if id_adresse_facturation else id_adresse_livraison
+
     date_achat = datetime.now().strftime('%Y-%m-%d')
     mycursor.execute(
-        "INSERT INTO commande (date_achat, utilisateur_id, etat_id) VALUES (%s, %s, 1)",
-        (date_achat, id_client)
+        "INSERT INTO commande (date_achat, utilisateur_id, etat_id, id_adresse_livraison, id_adresse_facturation) VALUES (%s, %s, 1, %s, %s)",
+        (date_achat, id_client, id_adresse_livraison, id_adresse_fact)
     )
     mycursor.execute("SELECT LAST_INSERT_ID() AS last_id")
     id_commande = mycursor.fetchone()['last_id']
@@ -84,6 +111,15 @@ def client_commande_add():
             "INSERT INTO ligne_commande (commande_id, id_declinaison, prix, quantite) VALUES (%s, %s, %s, %s)",
             (id_commande, item['id_declinaison'], item['prix'], item['quantite'])
         )
+
+    mycursor.execute(
+        "UPDATE adresse SET favori = 0 WHERE utilisateur_id = %s",
+        (id_client,)
+    )
+    mycursor.execute(
+        "UPDATE adresse SET favori = 1 WHERE id_adresse = %s AND utilisateur_id = %s",
+        (id_adresse_livraison, id_client)
+    )
 
     get_db().commit()
     flash("Commande passée avec succès !", "alert-success")

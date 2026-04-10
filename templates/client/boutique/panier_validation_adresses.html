@@ -6,6 +6,31 @@
     {% include('client/boutique/_panier.html') %}
 
     <form action="/client/commande/add" method="post" class="mt-3">
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Adresse de livraison :</strong></label>
+            <select name="id_adresse_livraison" class="form-control" required>
+                {% for adresse in adresses %}
+                    <option value="{{ adresse.id_adresse }}" {% if adresse.favori == 1 %}selected{% endif %}>
+                        {{ adresse.nom }} — {{ adresse.rue }}, {{ adresse.code_postal }} {{ adresse.ville }}
+                        {% if adresse.favori == 1 %}⭐ (favorite){% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Adresse de facturation :</strong></label>
+            <select name="id_adresse_facturation" class="form-control">
+                <option value="">Même que la livraison</option>
+                {% for adresse in adresses %}
+                    <option value="{{ adresse.id_adresse }}">
+                        {{ adresse.nom }} — {{ adresse.rue }}, {{ adresse.code_postal }} {{ adresse.ville }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-success">Confirmer la commande</button>
         <a href="/client/article/show" class="btn btn-secondary ms-2">Annuler</a>
     </form>
