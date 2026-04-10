@@ -2,6 +2,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS note;
 DROP TABLE IF EXISTS commentaire;
 
+DROP TABLE IF EXISTS historique;
+DROP TABLE IF EXISTS wishlist;
+
 DROP TABLE IF EXISTS ligne_panier;
 DROP TABLE IF EXISTS ligne_commande;
 DROP TABLE IF EXISTS commande;
@@ -118,6 +121,33 @@ CREATE TABLE ligne_panier(
    PRIMARY KEY(utilisateur_id, id_declinaison),
    FOREIGN KEY(utilisateur_id) REFERENCES utilisateur(id_utilisateur),
    FOREIGN KEY(id_declinaison) REFERENCES declinaison(id_declinaison)
+);
+
+CREATE TABLE wishlist (
+    id_wishlist INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    id_velo INT NOT NULL,
+    date_ajout DATETIME DEFAULT CURRENT_TIMESTAMP,
+    position INT DEFAULT 0,
+
+
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_velo) REFERENCES Velo(id_velo),
+
+    UNIQUE(utilisateur_id, id_velo)
+);
+
+CREATE TABLE historique (
+    id_historique INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    id_velo INT NOT NULL,
+    date_consultation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    nb_consultation INT DEFAULT 1,
+
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_velo) REFERENCES Velo(id_velo),
+
+    UNIQUE(utilisateur_id, id_velo)
 );
 
 INSERT INTO utilisateur(id_utilisateur, login, email, nom, password, role) VALUES

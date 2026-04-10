@@ -60,19 +60,9 @@ articles (tableau de dictionnaires)
                   <td>
                       <div class="row">
                           <div class="col-3">
-                              <a  class="btn btn-outline-danger" href="/client/envie/delete?id_article={{ ligne.id_article }}" >supprimer</a>
+                              <a class="btn btn-outline-danger" href="/client/envie/toggle?id_article={{ ligne.id_article }}">💛</a>
                           </div>
-                          <div class="col-3">
-                          <form  action="/client/panier/add"  method="post" >
-                              <input type="hidden" name="id_article" value="{{ ligne.id_article }}">
-                              <input type="hidden" name="quantite" value="1">
-                                            <div class="input-group">
-                                            <button class="btn  btn-outline-success"  id="button-addon1">
-                                                <i class="fas fa-shopping-cart">commander</i>
-                                            </button>
-                                            </div>
-                          </form>
-                          </div>
+
                           {% if loop.index !=1 %}
                           <div class="col-1">
                               <a  class="btn btn-outline-warning" href="/client/envies/up?id_article={{ ligne.id_article }}">⬆</a>
@@ -83,16 +73,7 @@ articles (tableau de dictionnaires)
                               <a  class="btn btn-outline-warning" href="/client/envies/down?id_article={{ ligne.id_article }}">️⬇</a>
                           </div>
                           {% endif %}
-                          {% if  loop.index != 1 %}
-                          <div class="col-1">
-                              <a  class="btn btn-outline-warning" href="/client/envies/first?id_article={{ ligne.id_article }}">⏫</a>
-                          </div>
-                          {% endif %}
-                          {% if   loop.index != loop.length %}
-                          <div class="col-1">
-                              <a  class="btn btn-outline-warning" href="/client/envies/last?id_article={{ ligne.id_article }}">⏬</a>
-                          </div>
-                          {% endif %}
+
                           <div class="col-1">{{ compteur_id_article }}</div>
                       </div>
                   </td>

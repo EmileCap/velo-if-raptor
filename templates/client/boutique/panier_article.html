@@ -49,10 +49,13 @@
                         <hr>
                     </a>
                     <div class="row">
-                        {% if article.stock > 0 %}
-                            <a href="/client/panier/declinaison?id_article={{ article.id_article }}"
-                               class="btn btn-success col-5">Ajouter</a>
-                        {% endif %}
+    {% if article.stock > 0 %}
+        <a href="/client/panier/declinaison?id_article={{ article.id_article }}"
+           class="btn btn-success col-5">Ajouter</a>
+    {% endif %}
+
+    <a href="/client/envie/toggle?id_article={{ article.id_article }}"
+       class="btn btn-outline-danger col-2">💛</a>
                     </div>
                 </div>
                 <div class="card-footer">
