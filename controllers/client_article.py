@@ -31,7 +31,7 @@ def client_article_show():
         COUNT(DISTINCT c.id_commentaire) AS nb_commentaires
     FROM Velo v
     INNER JOIN type t ON v.id_type = t.id_type
-    LEFT  JOIN declinaison d ON d.id_velo = v.id_velo AND d.valide = 1
+    LEFT  JOIN declinaison d ON d.id_velo = v.id_velo
     LEFT  JOIN note n ON n.id_velo = v.id_velo
     LEFT  JOIN commentaire c ON c.id_velo = v.id_velo AND c.id_commentaire_parent IS NULL
     WHERE 1=1
